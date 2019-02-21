@@ -22,16 +22,22 @@ public class NeatLineEditor : Editor
 
         GUI.Box(EditorGUILayout.BeginVertical(), "");
         EditorGUIUtility.wideMode = true;
-
-        line.HeadLocalPosition = EditorGUILayout.Vector3Field("Head Position", line.HeadLocalPosition);
-
+        line.HeadLocalPosition = EditorGUILayout.Vector2Field("Head Position", line.HeadLocalPosition);
         EditorGUILayout.EndVertical();
 
         GUI.Box(EditorGUILayout.BeginVertical(), "");
         EditorGUIUtility.wideMode = true;
+        line.TailLocalPosition = EditorGUILayout.Vector2Field("Tail Position", line.TailLocalPosition);
+        EditorGUILayout.EndVertical();
 
-        line.TailLocalPosition = EditorGUILayout.Vector3Field("Tail Position", line.TailLocalPosition);
+        GUI.Box(EditorGUILayout.BeginVertical(), "");
+        EditorGUIUtility.wideMode = true;
+        line.Color = EditorGUILayout.ColorField("Color", line.Color);
+        EditorGUILayout.EndVertical();
 
+        GUI.Box(EditorGUILayout.BeginVertical(), "");
+        EditorGUIUtility.wideMode = true;
+        line.Thickness = EditorGUILayout.FloatField("Thickness", line.Thickness);
         EditorGUILayout.EndVertical();
 
         serializedObject.ApplyModifiedProperties();
