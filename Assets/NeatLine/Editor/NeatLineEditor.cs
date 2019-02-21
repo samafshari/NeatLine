@@ -7,9 +7,7 @@ using UnityEngine;
 public class NeatLineEditor : Editor
 {
     NeatLine line;
-    bool doMoveAction = false;
-    bool headSelected = false;
-
+    
     private void OnEnable()
     {
         line = target as NeatLine;
