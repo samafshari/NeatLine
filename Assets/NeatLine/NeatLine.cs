@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Material))]
 [RequireComponent(typeof(MeshFilter))]
@@ -8,6 +6,7 @@ using UnityEngine;
 public class NeatLine : MonoBehaviour
 {
     bool isDirty = false;
+    bool isColorDirty = false;
     readonly Vector2[] points = new Vector2[2];
 
     MeshFilter meshFilter;
@@ -59,7 +58,7 @@ public class NeatLine : MonoBehaviour
         set
         {
             _color = value;
-            isDirty = true;
+            isColorDirty = true;
         }
     }
 
@@ -71,19 +70,35 @@ public class NeatLine : MonoBehaviour
         material = GetComponent<Material>();
         meshRenderer = GetComponent<MeshRenderer>();
 
-        if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
-        if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
-        if (material != null)
+        if (meshFilter == null)
         {
-            meshRenderer.material = material;
+            meshFilter = gameObject.AddComponent<MeshFilter>();
         }
-        material = meshRenderer.material;
+
+        if (meshRenderer == null)
+        {
+            meshRenderer = gameObject.AddComponent<MeshRenderer>();
+        }
+
+        if (material == null)
+        {
+            material = Resources.Load<Material>("NeatLineMaterial");
+        }
+        meshRenderer.material = material;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isDirty) Rebuild();
+        if (isDirty)
+        {
+            Rebuild();
+        }
+        if (isColorDirty)
+        {
+            material.color = Color;
+            isColorDirty = false;
+        }
     }
 
     void Rebuild()
@@ -102,12 +117,16 @@ public class NeatLine : MonoBehaviour
 
     Vector3[] GetPolygon()
     {
+        var vec = TailLocalPosition - HeadLocalPosition;
+        var unit = vec.normalized;
+        var halfCross = new Vector3(unit.y, -unit.x, 0) * 0.5f * Thickness;
+
         return new[]
         {
-            new Vector3(HeadLocalPosition.x, HeadLocalPosition.y),
-            new Vector3(HeadLocalPosition.x, HeadLocalPosition.y) + Vector3.up,
-            new Vector3(TailLocalPosition.x, TailLocalPosition.y),
-            new Vector3(TailLocalPosition.x, TailLocalPosition.y) + Vector3.up
+            new Vector3(HeadLocalPosition.x, HeadLocalPosition.y) - halfCross,
+            new Vector3(HeadLocalPosition.x, HeadLocalPosition.y) + halfCross,
+            new Vector3(TailLocalPosition.x, TailLocalPosition.y) + halfCross,
+            new Vector3(TailLocalPosition.x, TailLocalPosition.y) - halfCross
         };
     }
 }
