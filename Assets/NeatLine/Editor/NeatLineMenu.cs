@@ -21,8 +21,10 @@ public class NeatLineMenu : MonoBehaviour
         obj.transform.localScale = Vector3.one;
         obj.transform.localRotation = Quaternion.identity;
         obj.transform.localPosition = Vector3.zero;
-        obj.layer = obj.transform.parent.gameObject.layer;
-
+        if (obj.transform.parent != null)
+        {
+            obj.layer = obj.transform.parent.gameObject.layer;
+        }
         Selection.activeGameObject = obj;
     }
 }

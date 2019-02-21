@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
+using Neat.Line;
 
+[ExecuteInEditMode]
+[System.Serializable]
 [RequireComponent(typeof(Material))]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -7,7 +10,12 @@ public class NeatLine : MonoBehaviour
 {
     bool isDirty = false;
     bool isColorDirty = false;
-    readonly Vector2[] points = new Vector2[2];
+    [HideInInspector]
+    public Vector2[] points = new Vector2[2]
+    {
+        new Vector2(-0.5f, -0.5f),
+        new Vector2(0.5f, 0.5f)
+    };
 
     MeshFilter meshFilter;
     MeshRenderer meshRenderer;
@@ -33,7 +41,7 @@ public class NeatLine : MonoBehaviour
         }
     }
 
-    float _thickness = 0.1f;
+    [HideInInspector] public float _thickness = 0.1f;
     public float Thickness
     {
         get => _thickness;
@@ -51,7 +59,7 @@ public class NeatLine : MonoBehaviour
         }
     }
 
-    Color _color = Color.white;
+    [HideInInspector] public Color _color = Color.white;
     public Color Color
     {
         get => _color;
@@ -85,6 +93,9 @@ public class NeatLine : MonoBehaviour
             material = Resources.Load<Material>("NeatLineMaterial");
         }
         meshRenderer.material = material;
+
+        isDirty = true;
+        isColorDirty = true;
     }
 
     // Update is called once per frame
@@ -92,19 +103,18 @@ public class NeatLine : MonoBehaviour
     {
         if (isDirty)
         {
+            isDirty = false;
             Rebuild();
         }
         if (isColorDirty)
         {
-            material.color = Color;
             isColorDirty = false;
+            material.color = Color;
         }
     }
 
     void Rebuild()
     {
-        isDirty = false;
-
         var mesh = new Mesh();
         meshFilter.mesh = mesh;
         mesh.vertices = GetPolygon();
@@ -128,5 +138,12 @@ public class NeatLine : MonoBehaviour
             new Vector3(TailLocalPosition.x, TailLocalPosition.y) + halfCross,
             new Vector3(TailLocalPosition.x, TailLocalPosition.y) - halfCross
         };
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (meshRenderer == null) return;
+        Gizmos.color = Color.clear;
+        Gizmos.DrawCube(meshRenderer.bounds.center, meshRenderer.bounds.size + Vector3.forward);
     }
 }
