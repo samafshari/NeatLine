@@ -13,7 +13,9 @@ public class NeatPolyline : MonoBehaviour
     MeshFilter meshFilter;
     MeshRenderer meshRenderer;
     Material material;
-    
+
+    public bool MakeDirty() => isDirty = true;
+
     bool isDirty = false;
 
     [HideInInspector]
@@ -29,7 +31,18 @@ public class NeatPolyline : MonoBehaviour
     [HideInInspector]
     public Color[] _colors = new Color[] { Color.white, Color.white };
 
-    public bool UpdateInEditMode = true;
+    [HideInInspector]
+    public float _thicknessMultiplier = 1.0f;
+
+    public float ThicknessMultiplier
+    {
+        get => _thicknessMultiplier;
+        set
+        {
+            _thicknessMultiplier = value;
+            isDirty = true;
+        }
+    }
 
     public void SetVector(int index, Vector2 value)
     {
@@ -49,9 +62,14 @@ public class NeatPolyline : MonoBehaviour
         isDirty = true;
     }
 
+    public void RemoveLast()
+    {
+        RemoveAt(_points.Length - 1);
+    }
+
     public void RemoveAt(int index)
     {
-        if (_points.Length >= index)
+        if (_points.Length < index)
             throw new System.IndexOutOfRangeException("Not enough points to delete.");
 
         if (_points.Length == 2)
@@ -60,17 +78,27 @@ public class NeatPolyline : MonoBehaviour
         var newPoints = new Vector2[_points.Length - 1];
         var newThicknesses = new float[_points.Length - 1];
         var newColors = new Color[_points.Length - 1];
+        int shift = 0;
         for (int i = 0; i < _points.Length; i++)
         {
-            if (i == index) continue;
-            newPoints[i] = _points[i];
-            newThicknesses[i] = _thicknesses[i];
-            newColors[i] = _colors[i];
+            if (i == index)
+            {
+                shift--;
+                continue;
+            }
+            newPoints[i + shift] = _points[i];
+            newThicknesses[i + shift] = _thicknesses[i];
+            newColors[i + shift] = _colors[i];
         }
         _points = newPoints;
         _thicknesses = newThicknesses;
         _colors = newColors;
         isDirty = true;
+    }
+
+    public void Add()
+    {
+        Add(_points.Last() + Vector2.one);
     }
 
     public void Add(Vector2 point, float? thickness = null, Color? color = null)
@@ -125,20 +153,12 @@ public class NeatPolyline : MonoBehaviour
         meshRenderer.material = material;
 
         isDirty = true;
-
-        Add(new Vector2(5, -5));
-        SetColor(0, Color.red);
-        SetColor(1, Color.white);
-        SetColor(2, Color.blue);
-        SetThickness(0, 0.1f);
-        SetThickness(1, 0.3f);
-        SetThickness(2, 0.2f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isDirty || (UpdateInEditMode && !Application.isPlaying))
+        if (isDirty)
         {
             isDirty = false;
             Rebuild();
@@ -161,7 +181,7 @@ public class NeatPolyline : MonoBehaviour
             var head = _points[i];
             var unit = (_points[i + 1] - head).normalized;
             cross = new Vector3(unit.y, -unit.x, 0) * 0.5f;
-            var headCross = cross * _thicknesses[i];
+            var headCross = cross * _thicknesses[i] * ThicknessMultiplier;
 
             colors[vertexIndex] = _colors[i];
             vertices[vertexIndex++] = new Vector3(head.x, head.y) - headCross;
@@ -171,7 +191,7 @@ public class NeatPolyline : MonoBehaviour
         }
 
         var tail = _points[_points.Length - 1];
-        var tailCross = cross * _thicknesses[_points.Length - 1];
+        var tailCross = cross * _thicknesses[_points.Length - 1] * ThicknessMultiplier;
 
         colors[vertexIndex] = _colors[_points.Length - 1];
         vertices[vertexIndex++] = new Vector3(tail.x, tail.y) - tailCross;

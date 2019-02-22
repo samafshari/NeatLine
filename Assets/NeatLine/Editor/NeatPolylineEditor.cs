@@ -18,11 +18,7 @@ public class NeatPolylineEditor : Editor
         Undo.RecordObject(target, "NeatLine Edit");
         serializedObject.Update();
 
-        //DrawDefaultInspector();
-        GUI.Box(EditorGUILayout.BeginVertical(), "");
-        EditorGUIUtility.wideMode = true;
-        line.UpdateInEditMode = EditorGUILayout.Toggle($"Update in Edit Mode", line.UpdateInEditMode);
-        EditorGUILayout.EndVertical();
+        line.ThicknessMultiplier = EditorGUILayout.FloatField($"Thickness Multiplier", line.ThicknessMultiplier);
 
         int i = -1;
         foreach (var point in line._points)
@@ -31,20 +27,21 @@ public class NeatPolylineEditor : Editor
             GUI.Box(EditorGUILayout.BeginVertical(), "");
             EditorGUIUtility.wideMode = true;
             line._points[i] = EditorGUILayout.Vector2Field($"Point {i}", line._points[i]);
-            EditorGUILayout.EndVertical();
-
-            GUI.Box(EditorGUILayout.BeginVertical(), "");
-            EditorGUIUtility.wideMode = true;
             line._colors[i] = EditorGUILayout.ColorField($"Color {i}", line._colors[i]);
-            EditorGUILayout.EndVertical();
-
-            GUI.Box(EditorGUILayout.BeginVertical(), "");
-            EditorGUIUtility.wideMode = true;
             line._thicknesses[i] = EditorGUILayout.FloatField($"Thickness {i}", line._thicknesses[i]);
+            if (GUILayout.Button($"Remove Point {i}")) line.RemoveAt(i);
             EditorGUILayout.EndVertical();
+            EditorGUILayout.Separator();
         }
+
+        GUI.Box(EditorGUILayout.BeginVertical(), "");
+
+        if (GUILayout.Button("Add Point")) line.Add();
+        EditorGUILayout.EndVertical();
 
         serializedObject.ApplyModifiedProperties();
         EditorUtility.SetDirty(target);
+
+        line.MakeDirty();
     }
 }
