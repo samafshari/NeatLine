@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Neat.Line;
 
 [ExecuteInEditMode]
 [System.Serializable]
@@ -118,9 +117,7 @@ public class NeatLine : MonoBehaviour
         var mesh = new Mesh();
         meshFilter.mesh = mesh;
         mesh.vertices = GetPolygon();
-
-        Triangulator tr = new Triangulator(mesh.vertices);
-        mesh.triangles = tr.Triangulate();
+        mesh.triangles = new[] { 0, 1, 2, 2, 3, 0 };
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
     }
