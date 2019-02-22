@@ -89,9 +89,9 @@ public class NeatLine : MonoBehaviour
 
         if (material == null)
         {
-            material = Resources.Load<Material>("NeatLineMaterial");
+            material = Instantiate(Resources.Load<Material>("NeatLineMaterial"));
         }
-        meshRenderer.sharedMaterial = material;
+        meshRenderer.material = material;
 
         isDirty = true;
         isColorDirty = true;
