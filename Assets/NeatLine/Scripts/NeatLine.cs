@@ -8,7 +8,6 @@
 public class NeatLine : MonoBehaviour
 {
     bool isDirty = false;
-    bool isColorDirty = false;
     [HideInInspector]
     public Vector2[] points = new Vector2[2]
     {
@@ -65,7 +64,7 @@ public class NeatLine : MonoBehaviour
         set
         {
             _color = value;
-            isColorDirty = true;
+            isDirty = true;
         }
     }
 
@@ -94,7 +93,6 @@ public class NeatLine : MonoBehaviour
         meshRenderer.material = material;
 
         isDirty = true;
-        isColorDirty = true;
     }
 
     // Update is called once per frame
@@ -105,11 +103,6 @@ public class NeatLine : MonoBehaviour
             isDirty = false;
             Rebuild();
         }
-        if (isColorDirty)
-        {
-            isColorDirty = false;
-            material.color = Color;
-        }
     }
 
     void Rebuild()
@@ -117,7 +110,8 @@ public class NeatLine : MonoBehaviour
         var mesh = new Mesh();
         meshFilter.mesh = mesh;
         mesh.vertices = GetPolygon();
-        mesh.triangles = new[] { 0, 1, 2, 2, 3, 0 };
+        mesh.triangles = new[] { 0, 1, 2, 1, 2, 3 };
+        mesh.colors = new[] { Color, Color, Color, Color }; 
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
     }
@@ -132,8 +126,8 @@ public class NeatLine : MonoBehaviour
         {
             new Vector3(HeadLocalPosition.x, HeadLocalPosition.y) - halfCross,
             new Vector3(HeadLocalPosition.x, HeadLocalPosition.y) + halfCross,
-            new Vector3(TailLocalPosition.x, TailLocalPosition.y) + halfCross,
-            new Vector3(TailLocalPosition.x, TailLocalPosition.y) - halfCross
+            new Vector3(TailLocalPosition.x, TailLocalPosition.y) - halfCross,
+            new Vector3(TailLocalPosition.x, TailLocalPosition.y) + halfCross
         };
     }
 
