@@ -27,3 +27,5 @@ Assets/UnityVS
 bin
 Binaries
 .DS_Store
+/Assets/AssetStoreTools
+/Assets/AssetStoreTools*
