@@ -39,6 +39,18 @@ public class NeatLine : MonoBehaviour
         }
     }
 
+    public Vector2 HeadPosition
+    {
+        get => transform.TransformPoint(HeadLocalPosition);
+        set => HeadLocalPosition = transform.InverseTransformPoint(value);
+    }
+
+    public Vector2 TailPosition
+    {
+        get => transform.TransformPoint(TailLocalPosition);
+        set => TailLocalPosition = transform.InverseTransformPoint(value);
+    }
+
     [HideInInspector] public float _thickness = 0.1f;
     public float Thickness
     {
